@@ -1,0 +1,503 @@
+{% extends 'layout.html' %}
+
+{% block extra_head %}
+<script src="{{ url_for('static', filename='js/chart-config.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/content-generator.js') }}" defer></script>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <h1 class="page-title">Content Automation Dashboard</h1>
+    <div class="d-flex">
+        <button class="btn btn-primary automation-btn" id="startAutomationBtn">
+            <i class="fas fa-wand-magic-sparkles me-2"></i> Start Automation
+        </button>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Manual Controls Box -->
+    <div class="col-lg-3 order-lg-2 mb-4">
+        <div class="dashboard-card h-100">
+            <div class="dashboard-card-header">
+                <h5 class="mb-0">Manual Controls</h5>
+            </div>
+            <div class="dashboard-card-body">
+                <div class="d-grid gap-3">
+                    <button class="btn btn-outline-primary" id="startTrendResearchBtn">
+                        <i class="fas fa-search me-2"></i> Start Trend Research
+                    </button>
+                    <button class="btn btn-outline-primary" id="generateContentBtn">
+                        <i class="fas fa-pen-fancy me-2"></i> Generate Content
+                    </button>
+                    <button class="btn btn-outline-primary" id="createVideoBtn">
+                        <i class="fas fa-video me-2"></i> Create Video
+                    </button>
+                    <button class="btn btn-outline-primary" id="optimizeSEOBtn">
+                        <i class="fas fa-chart-line me-2"></i> Optimize SEO
+                    </button>
+                    <button class="btn btn-outline-primary" id="uploadYouTubeBtn">
+                        <i class="fas fa-upload me-2"></i> Upload to YouTube
+                    </button>
+                </div>
+                
+                <div class="manual-mode-toggle mt-4">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-muted">Manual Mode</span>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="automationModeSwitch" {% if mode == 'autopilot' %}checked{% endif %}>
+                            <label class="form-check-label" for="automationModeSwitch">Autopilot</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="col-lg-9 order-lg-1">
+        <!-- Statistics Cards Row -->
+        <div class="row mb-4">
+            <div class="col-md-3 col-sm-6 mb-4 mb-md-0">
+                <div class="stat-card">
+                    <div class="stat-card-content">
+                        <h6 class="stat-card-title">TOTAL VIEWS</h6>
+                        <div class="d-flex align-items-center">
+                            <h3 class="stat-card-value">{{ analytics.total_views|format_number }}</h3>
+                            <span class="stat-card-trend positive ms-2">
+                                <i class="fas fa-arrow-up me-1"></i>{{ analytics.view_growth }}%
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-4 mb-md-0">
+                <div class="stat-card">
+                    <div class="stat-card-content">
+                        <h6 class="stat-card-title">SUBSCRIBERS</h6>
+                        <div class="d-flex align-items-center">
+                            <h3 class="stat-card-value">{{ analytics.subscribers|format_number }}</h3>
+                            <span class="stat-card-trend positive ms-2">
+                                <i class="fas fa-arrow-up me-1"></i>{{ analytics.subscriber_growth }}%
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-4 mb-md-0">
+                <div class="stat-card">
+                    <div class="stat-card-content">
+                        <h6 class="stat-card-title">REVENUE</h6>
+                        <div class="d-flex align-items-center">
+                            <h3 class="stat-card-value">${{ analytics.revenue|format_number }}</h3>
+                            <span class="stat-card-trend positive ms-2">
+                                <i class="fas fa-arrow-up me-1"></i>{{ analytics.revenue_growth }}%
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-card">
+                    <div class="stat-card-content">
+                        <h6 class="stat-card-title">VIDEOS PUBLISHED</h6>
+                        <div class="d-flex align-items-center">
+                            <h3 class="stat-card-value">{{ analytics.videos_published }}</h3>
+                            <span class="stat-card-trend neutral ms-2">
+                                this year
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Boxes Row -->
+        <div class="row mb-4">
+            <!-- Next Video Schedule -->
+            <div class="col-lg-5 mb-4 mb-lg-0">
+                <div class="dashboard-card h-100">
+                    <div class="dashboard-card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Next Video Schedule</h5>
+                    </div>
+                    <div class="dashboard-card-body">
+                        <div class="scheduled-videos-list">
+                            {% for video in schedule %}
+                            <div class="scheduled-video-item">
+                                <div class="d-flex">
+                                    <div class="scheduled-video-icon">
+                                        <i class="fas fa-calendar-days"></i>
+                                    </div>
+                                    <div class="scheduled-video-info ms-3">
+                                        <h6 class="scheduled-video-title">{{ video.title }}</h6>
+                                        <p class="scheduled-video-date">{{ video.display_date }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <button class="btn btn-outline-secondary btn-sm w-100 mt-3" data-bs-toggle="modal" data-bs-target="#scheduleModal">
+                            <i class="fas fa-plus me-2"></i> Add New Schedule
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trending Topics -->
+            <div class="col-lg-7">
+                <div class="dashboard-card h-100">
+                    <div class="dashboard-card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Trending Topics</h5>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-filter me-1"></i> Filter
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                {% for category in categories %}
+                                <li><a class="dropdown-item trend-category" href="#" data-category="{{ category }}">{{ category }}</a></li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="dashboard-card-body">
+                        <div id="trendingTopicsList">
+                            {% for topic in trending_topics %}
+                            <div class="trending-topic-item">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <div class="d-flex align-items-center">
+                                        {% if topic.icon == 'flame' %}
+                                        <i class="fas fa-fire text-danger me-2"></i>
+                                        {% else %}
+                                        <i class="fas fa-bolt text-warning me-2"></i>
+                                        {% endif %}
+                                        <h6 class="trending-topic-title mb-0">{{ topic.keyword }}</h6>
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-primary use-trend-btn" 
+                                            data-trend="{{ topic.keyword }}">
+                                        Use
+                                    </button>
+                                </div>
+                                <div class="d-flex align-items-center mb-2">
+                                    <small class="text-muted me-2">Interest: {{ topic.interest }}%</small>
+                                    <div class="progress flex-grow-1" style="height: 6px;">
+                                        <div class="progress-bar {% if topic.interest >= 85 %}bg-danger{% elif topic.interest >= 75 %}bg-warning{% else %}bg-primary{% endif %}" 
+                                             role="progressbar" 
+                                             style="width: {{ topic.interest }}%" 
+                                             aria-valuenow="{{ topic.interest }}" 
+                                             aria-valuemin="0" 
+                                             aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Boxes Row -->
+        <div class="row">
+            <!-- Channel Performance -->
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <h5 class="mb-0">Channel Performance</h5>
+                    </div>
+                    <div class="dashboard-card-body">
+                        <canvas id="channelPerformanceChart" height="250" data-performance='{{ channel_performance|tojson }}'></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Content Assistant -->
+            <div class="col-lg-6">
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <h5 class="mb-0">AI Content Assistant</h5>
+                    </div>
+                    <div class="dashboard-card-body">
+                        <div class="mb-3">
+                            <textarea class="form-control" id="contentPrompt" rows="6" placeholder="Enter a topic or keyword..."></textarea>
+                        </div>
+                        <div class="d-flex">
+                            <button class="btn btn-primary me-2" id="generateScriptBtn">
+                                Generate Script
+                            </button>
+                            <button class="btn btn-outline-primary me-2" id="generateTitleBtn">
+                                Generate Title
+                            </button>
+                            <button class="btn btn-outline-primary" id="generateKeywordsBtn">
+                                SEO Keywords
+                            </button>
+                        </div>
+                        <div class="mt-3">
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="ai-assistant-icon me-2">
+                                    <i class="fas fa-robot"></i>
+                                </div>
+                                <h6 class="mb-0">AI Script Generator</h6>
+                            </div>
+                            <p class="small text-muted">Creates complete video scripts based on keywords.</p>
+                            
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="ai-assistant-icon me-2">
+                                    <i class="fas fa-lightbulb"></i>
+                                </div>
+                                <h6 class="mb-0">Content Idea Generator</h6>
+                            </div>
+                            <p class="small text-muted">Suggests trending content ideas for your channel.</p>
+                            
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="ai-assistant-icon me-2">
+                                    <i class="fas fa-chart-simple"></i>
+                                </div>
+                                <h6 class="mb-0">SEO Optimizer</h6>
+                            </div>
+                            <p class="small text-muted">Optimizes titles and descriptions for better visibility.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Videos -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <h5 class="mb-0">Recent Videos</h5>
+                    </div>
+                    <div class="dashboard-card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover video-table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">VIDEO</th>
+                                        <th scope="col">VIEWS</th>
+                                        <th scope="col">LIKES</th>
+                                        <th scope="col">COMMENTS</th>
+                                        <th scope="col">PUBLISHED</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for video in recent_videos %}
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="video-thumbnail me-3">
+                                                    <img src="{{ video.thumbnail }}" alt="{{ video.title }}">
+                                                </div>
+                                                <div class="video-info">
+                                                    <h6 class="mb-0">{{ video.title }}</h6>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>{{ video.views|format_number }}</td>
+                                        <td>{{ video.likes|format_number }}</td>
+                                        <td>{{ video.comments }}</td>
+                                        <td>{{ video.published }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Schedule Modal -->
+<div class="modal fade" id="scheduleModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Schedule New Video</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="scheduleForm">
+                    <div class="mb-3">
+                        <label for="videoTitle" class="form-label">Video Title</label>
+                        <input type="text" class="form-control" id="videoTitle" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="scheduleDate" class="form-label">Date</label>
+                            <input type="date" class="form-control" id="scheduleDate" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="scheduleTime" class="form-label">Time</label>
+                            <input type="time" class="form-control" id="scheduleTime" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="scheduleCategory" class="form-label">Category</label>
+                        <select class="form-select" id="scheduleCategory" required>
+                            {% for category in categories %}
+                            <option value="{{ category }}">{{ category }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveScheduleBtn">Schedule</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Content Generation Modal -->
+<div class="modal fade" id="contentGenerationModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="contentModalTitle">Generate Content</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="contentKeyword" class="form-label">Keyword or Topic</label>
+                    <input type="text" class="form-control" id="contentKeyword" placeholder="e.g., Artificial Intelligence in Healthcare">
+                </div>
+                <div class="mb-3">
+                    <label for="contentCategory" class="form-label">Category</label>
+                    <select class="form-select" id="contentCategory">
+                        {% for category in categories %}
+                        <option value="{{ category }}">{{ category }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div id="generatedContentContainer" class="d-none">
+                    <hr>
+                    <div class="mb-3">
+                        <label class="form-label">Title</label>
+                        <div class="generated-content-box" id="generatedTitle"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <div class="generated-content-box" id="generatedDescription"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Script</label>
+                        <div class="generated-content-box script" id="generatedScript"></div>
+                    </div>
+                </div>
+                <div id="contentSpinner" class="text-center my-5 d-none">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-3 text-muted">Generating your content...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="d-flex w-100 justify-content-between">
+                    <div>
+                        <button type="button" class="btn btn-outline-secondary me-2" data-bs-dismiss="modal">Close</button>
+                    </div>
+                    <div>
+                        <button type="button" class="btn btn-primary me-2 d-none" id="createVideoFromContentBtn">Create Video</button>
+                        <button type="button" class="btn btn-outline-primary d-none" id="optimizeSEOFromContentBtn">Optimize SEO</button>
+                        <button type="button" class="btn btn-primary" id="generateContentModalBtn">Generate</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Video Creation Modal -->
+<div class="modal fade" id="videoCreationModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create Video</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="videoScriptInput" class="form-label">Video Script</label>
+                    <textarea class="form-control" id="videoScriptInput" rows="8" placeholder="Enter your video script..."></textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="videoTitleInput" class="form-label">Video Title</label>
+                    <input type="text" class="form-control" id="videoTitleInput" placeholder="Enter video title">
+                </div>
+                <div id="videoCreationProgress" class="d-none">
+                    <div class="progress mb-3">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
+                    </div>
+                    <p id="videoCreationStatus" class="text-center">Initializing video creation...</p>
+                </div>
+                <div id="videoCreationResult" class="text-center d-none">
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle me-2"></i> Video created successfully!
+                    </div>
+                    <p>Your video is now ready and can be found in the generated_videos folder.</p>
+                    <p><strong>File:</strong> <span id="videoFilePath"></span></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="startVideoCreationBtn">Create Video</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SEO Optimization Modal -->
+<div class="modal fade" id="seoOptimizationModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Optimize SEO</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="seoTitleInput" class="form-label">Video Title</label>
+                    <input type="text" class="form-control" id="seoTitleInput" placeholder="Enter your video title">
+                </div>
+                <div class="mb-3">
+                    <label for="seoDescriptionInput" class="form-label">Video Description</label>
+                    <textarea class="form-control" id="seoDescriptionInput" rows="5" placeholder="Enter your video description..."></textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="seoKeywordsInput" class="form-label">Keywords (comma separated)</label>
+                    <input type="text" class="form-control" id="seoKeywordsInput" placeholder="keyword1, keyword2, keyword3">
+                </div>
+                <div id="seoOptimizationSpinner" class="text-center my-3 d-none">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2 text-muted">Optimizing SEO...</p>
+                </div>
+                <div id="seoOptimizationResult" class="d-none">
+                    <hr>
+                    <h6>Optimized Results</h6>
+                    <div class="mb-3">
+                        <label class="form-label">Optimized Title</label>
+                        <div class="generated-content-box" id="optimizedTitle"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Optimized Description</label>
+                        <div class="generated-content-box" id="optimizedDescription"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Suggested Tags</label>
+                        <div class="generated-content-box" id="suggestedTags"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="startSeoOptimizationBtn">Optimize</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

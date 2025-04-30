@@ -1,0 +1,486 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <h1 class="page-title">Content</h1>
+    <div class="d-flex">
+        <button class="btn btn-outline-secondary me-2">
+            <i class="fas fa-filter me-2"></i> Filter
+        </button>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createContentModal">
+            <i class="fas fa-plus me-2"></i> Create New
+        </button>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Video Library -->
+    <div class="col-12">
+        <div class="dashboard-card mb-4">
+            <div class="dashboard-card-header">
+                <h5 class="mb-0">Video Library</h5>
+            </div>
+            <div class="dashboard-card-body p-0">
+                <div class="video-grid">
+                    <div class="row g-4">
+                        {% for video in videos %}
+                        <div class="col-xl-3 col-lg-4 col-md-6">
+                            <div class="video-card">
+                                <div class="video-thumbnail">
+                                    <img src="{{ video.thumbnail }}" alt="{{ video.title }}">
+                                    <div class="video-duration">5:24</div>
+                                    <div class="video-overlay">
+                                        <button class="video-play-btn">
+                                            <i class="fas fa-play"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="video-details">
+                                    <h6 class="video-title">{{ video.title }}</h6>
+                                    <div class="video-meta">
+                                        <span><i class="fas fa-eye me-1"></i> {{ video.views|format_number }}</span>
+                                        <span><i class="fas fa-thumbs-up me-1"></i> {{ video.likes|format_number }}</span>
+                                        <span><i class="fas fa-comment me-1"></i> {{ video.comments }}</span>
+                                    </div>
+                                    <div class="video-actions mt-2">
+                                        <button class="btn btn-sm btn-outline-secondary me-1">
+                                            <i class="fas fa-pen"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-secondary me-1">
+                                            <i class="fas fa-download"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-secondary me-1">
+                                            <i class="fas fa-chart-simple"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Video Preview -->
+    <div class="col-lg-8 d-none">
+        <div class="dashboard-card mb-4">
+            <div class="dashboard-card-header">
+                <h5 class="mb-0">Video Preview</h5>
+            </div>
+            <div class="dashboard-card-body">
+                <div class="video-preview-container">
+                    <div class="video-player">
+                        <div class="video-placeholder">
+                            <i class="fas fa-play-circle"></i>
+                            <p>Select a video to preview</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="video-details mt-4">
+                    <h4 class="video-title">Top 5 AI Tools for Content Creation in 2025</h4>
+                    <div class="video-stats d-flex mt-3">
+                        <div class="me-4">
+                            <i class="fas fa-eye me-2"></i>
+                            <span>24.5K views</span>
+                        </div>
+                        <div class="me-4">
+                            <i class="fas fa-thumbs-up me-2"></i>
+                            <span>2.1K likes</span>
+                        </div>
+                        <div>
+                            <i class="fas fa-comment me-2"></i>
+                            <span>345 comments</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <h6>Description</h6>
+                        <p>In this comprehensive video, we explore the top 5 AI tools that are revolutionizing content creation in 2025. Learn about the latest innovations, key features, and how these tools can boost your productivity.</p>
+                        <p>#AI #ContentCreation #TubeAI</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Video Details -->
+    <div class="col-lg-4 d-none">
+        <div class="dashboard-card mb-4">
+            <div class="dashboard-card-header">
+                <h5 class="mb-0">Video Details</h5>
+            </div>
+            <div class="dashboard-card-body">
+                <div class="mb-4">
+                    <h6>Video Information</h6>
+                    <table class="table table-sm">
+                        <tbody>
+                            <tr>
+                                <td>Resolution</td>
+                                <td>1920x1080 (HD)</td>
+                            </tr>
+                            <tr>
+                                <td>Duration</td>
+                                <td>5:24</td>
+                            </tr>
+                            <tr>
+                                <td>Published</td>
+                                <td>April 27, 2024</td>
+                            </tr>
+                            <tr>
+                                <td>Category</td>
+                                <td>Technology</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="mb-4">
+                    <h6>Download Options</h6>
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-download me-2"></i> Download MP4 (1080p)
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary">
+                            <i class="fas fa-download me-2"></i> Download MP4 (720p)
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary">
+                            <i class="fas fa-file-audio me-2"></i> Download Audio Only
+                        </button>
+                    </div>
+                </div>
+                
+                <div>
+                    <h6>Actions</h6>
+                    <div class="d-flex flex-wrap gap-2">
+                        <button class="btn btn-sm btn-outline-secondary">
+                            <i class="fas fa-edit me-1"></i> Edit
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary">
+                            <i class="fas fa-share-alt me-1"></i> Share
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary">
+                            <i class="fas fa-chart-line me-1"></i> Analytics
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary">
+                            <i class="fas fa-copy me-1"></i> Duplicate
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger">
+                            <i class="fas fa-trash me-1"></i> Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Content Modal -->
+<div class="modal fade" id="createContentModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create New Content</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="create-content-steps">
+                    <div class="step-indicators mb-4">
+                        <div class="step-indicator active" data-step="1">
+                            <div class="step-number">1</div>
+                            <div class="step-label">Research</div>
+                        </div>
+                        <div class="step-connector"></div>
+                        <div class="step-indicator" data-step="2">
+                            <div class="step-number">2</div>
+                            <div class="step-label">Content</div>
+                        </div>
+                        <div class="step-connector"></div>
+                        <div class="step-indicator" data-step="3">
+                            <div class="step-number">3</div>
+                            <div class="step-label">Video</div>
+                        </div>
+                        <div class="step-connector"></div>
+                        <div class="step-indicator" data-step="4">
+                            <div class="step-number">4</div>
+                            <div class="step-label">Publish</div>
+                        </div>
+                    </div>
+                    
+                    <div class="step-content">
+                        <!-- Step 1: Research -->
+                        <div class="step-panel active" data-step="1">
+                            <h6 class="mb-3">Topic Research</h6>
+                            <div class="mb-3">
+                                <label for="contentCategory" class="form-label">Category</label>
+                                <select class="form-select" id="contentCategoryModal">
+                                    <option value="Technology">Technology</option>
+                                    <option value="Business">Business</option>
+                                    <option value="Education">Education</option>
+                                    <option value="Finance">Finance</option>
+                                    <option value="Health">Health</option>
+                                    <option value="Science">Science</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-primary" id="researchTrendsBtn">Research Trends</button>
+                            
+                            <div id="trendingTopicsResults" class="mt-4 d-none">
+                                <h6>Trending Topics</h6>
+                                <div class="list-group">
+                                    <!-- Trending topics will be populated here -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Step 2: Content -->
+                        <div class="step-panel" data-step="2">
+                            <h6 class="mb-3">Generate Content</h6>
+                            <div class="mb-3">
+                                <label for="selectedTopic" class="form-label">Selected Topic</label>
+                                <input type="text" class="form-control" id="selectedTopic" readonly>
+                            </div>
+                            <button class="btn btn-primary" id="generateContentBtn">Generate Content</button>
+                            
+                            <div id="generatedContentResults" class="mt-4 d-none">
+                                <div class="mb-3">
+                                    <label for="generatedTitle" class="form-label">Title</label>
+                                    <input type="text" class="form-control" id="generatedTitleInput">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="generatedDescription" class="form-label">Description</label>
+                                    <textarea class="form-control" id="generatedDescriptionInput" rows="3"></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="generatedScript" class="form-label">Script</label>
+                                    <textarea class="form-control" id="generatedScriptInput" rows="6"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Step 3: Video -->
+                        <div class="step-panel" data-step="3">
+                            <h6 class="mb-3">Create Video</h6>
+                            <div class="mb-3">
+                                <label class="form-label">Video Settings</label>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <select class="form-select" id="videoResolution">
+                                            <option value="1080p">1080p (Full HD)</option>
+                                            <option value="720p">720p (HD)</option>
+                                            <option value="480p">480p (SD)</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <select class="form-select" id="videoAspectRatio">
+                                            <option value="16:9">16:9 (Landscape)</option>
+                                            <option value="9:16">9:16 (Portrait)</option>
+                                            <option value="1:1">1:1 (Square)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary" id="createVideoModalBtn">Create Video</button>
+                            
+                            <div id="videoCreationStatus" class="mt-4 d-none">
+                                <div class="progress mb-3">
+                                    <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%" id="videoProgressBar"></div>
+                                </div>
+                                <p class="text-center" id="videoStatusText">Creating video...</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Step 4: Publish -->
+                        <div class="step-panel" data-step="4">
+                            <h6 class="mb-3">Publish Video</h6>
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="publishOption" id="publishNow" value="now" checked>
+                                    <label class="form-check-label" for="publishNow">
+                                        Publish Now
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="publishOption" id="publishLater" value="later">
+                                    <label class="form-check-label" for="publishLater">
+                                        Schedule for Later
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div id="scheduleOptions" class="mb-3 d-none">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="scheduleDate" class="form-label">Date</label>
+                                        <input type="date" class="form-control" id="scheduleDateInput">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="scheduleTime" class="form-label">Time</label>
+                                        <input type="time" class="form-control" id="scheduleTimeInput">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button class="btn btn-primary" id="publishVideoBtn">Publish to YouTube</button>
+                            
+                            <div class="alert alert-info mt-4">
+                                <i class="fas fa-info-circle me-2"></i> You'll be redirected to YouTube to complete the publishing process.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="d-flex w-100 justify-content-between">
+                    <button type="button" class="btn btn-outline-secondary" id="prevStepBtn" disabled>Previous</button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="nextStepBtn">Next</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Step navigation
+        const stepIndicators = document.querySelectorAll('.step-indicator');
+        const stepPanels = document.querySelectorAll('.step-panel');
+        const nextBtn = document.getElementById('nextStepBtn');
+        const prevBtn = document.getElementById('prevStepBtn');
+        let currentStep = 1;
+        
+        function goToStep(step) {
+            // Update step indicators
+            stepIndicators.forEach(indicator => {
+                if (parseInt(indicator.dataset.step) <= step) {
+                    indicator.classList.add('active');
+                } else {
+                    indicator.classList.remove('active');
+                }
+            });
+            
+            // Show current panel, hide others
+            stepPanels.forEach(panel => {
+                if (parseInt(panel.dataset.step) === step) {
+                    panel.classList.add('active');
+                } else {
+                    panel.classList.remove('active');
+                }
+            });
+            
+            // Update button states
+            prevBtn.disabled = step === 1;
+            
+            if (step === 4) {
+                nextBtn.style.display = 'none';
+            } else {
+                nextBtn.style.display = 'block';
+            }
+            
+            currentStep = step;
+        }
+        
+        nextBtn.addEventListener('click', () => {
+            if (currentStep < 4) {
+                goToStep(currentStep + 1);
+            }
+        });
+        
+        prevBtn.addEventListener('click', () => {
+            if (currentStep > 1) {
+                goToStep(currentStep - 1);
+            }
+        });
+        
+        // Schedule options toggle
+        const publishLater = document.getElementById('publishLater');
+        const publishNow = document.getElementById('publishNow');
+        const scheduleOptions = document.getElementById('scheduleOptions');
+        
+        publishLater.addEventListener('change', () => {
+            scheduleOptions.classList.remove('d-none');
+        });
+        
+        publishNow.addEventListener('change', () => {
+            scheduleOptions.classList.add('d-none');
+        });
+        
+        // Research trends button
+        const researchTrendsBtn = document.getElementById('researchTrendsBtn');
+        const trendingTopicsResults = document.getElementById('trendingTopicsResults');
+        
+        researchTrendsBtn.addEventListener('click', () => {
+            // Show loading state
+            researchTrendsBtn.disabled = true;
+            researchTrendsBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Researching...';
+            
+            // Simulate API call
+            setTimeout(() => {
+                trendingTopicsResults.classList.remove('d-none');
+                
+                // Generate sample results
+                const listGroup = trendingTopicsResults.querySelector('.list-group');
+                listGroup.innerHTML = `
+                    <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-fire text-danger me-2"></i>
+                            Artificial Intelligence in Healthcare
+                        </div>
+                        <button class="btn btn-sm btn-outline-primary select-topic-btn">Select</button>
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-fire text-danger me-2"></i>
+                            Next-Gen AR/VR Technology
+                        </div>
+                        <button class="btn btn-sm btn-outline-primary select-topic-btn">Select</button>
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-fire text-danger me-2"></i>
+                            Quantum Computing Breakthroughs
+                        </div>
+                        <button class="btn btn-sm btn-outline-primary select-topic-btn">Select</button>
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-bolt text-warning me-2"></i>
+                            Sustainable Energy Solutions
+                        </div>
+                        <button class="btn btn-sm btn-outline-primary select-topic-btn">Select</button>
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-bolt text-warning me-2"></i>
+                            Blockchain Beyond Crypto
+                        </div>
+                        <button class="btn btn-sm btn-outline-primary select-topic-btn">Select</button>
+                    </a>
+                `;
+                
+                // Reset button
+                researchTrendsBtn.disabled = false;
+                researchTrendsBtn.innerHTML = 'Research Trends';
+                
+                // Add event listeners to select buttons
+                const selectButtons = document.querySelectorAll('.select-topic-btn');
+                selectButtons.forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const topicText = e.target.parentElement.querySelector('div').textContent.trim();
+                        document.getElementById('selectedTopic').value = topicText;
+                        goToStep(2);
+                    });
+                });
+            }, 1500);
+        });
+    });
+</script>
+{% endblock %}

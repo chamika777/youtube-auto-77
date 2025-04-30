@@ -1,0 +1,605 @@
+{% extends 'layout.html' %}
+
+{% block extra_head %}
+<script src="{{ url_for('static', filename='js/chart-config.js') }}" defer></script>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <h1 class="page-title">Analytics</h1>
+    <div class="d-flex">
+        <div class="dropdown me-2">
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-calendar me-2"></i> Last 30 Days
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <li><a class="dropdown-item" href="#">Last 7 Days</a></li>
+                <li><a class="dropdown-item active" href="#">Last 30 Days</a></li>
+                <li><a class="dropdown-item" href="#">Last 90 Days</a></li>
+                <li><a class="dropdown-item" href="#">This Year</a></li>
+                <li><a class="dropdown-item" href="#">Custom Range</a></li>
+            </ul>
+        </div>
+        <button class="btn btn-outline-secondary">
+            <i class="fas fa-download me-2"></i> Export
+        </button>
+    </div>
+</div>
+
+<!-- Overview Statistics -->
+<div class="row mb-4">
+    <div class="col-md-3 col-sm-6 mb-4 mb-md-0">
+        <div class="stat-card">
+            <div class="stat-card-content">
+                <h6 class="stat-card-title">TOTAL VIEWS</h6>
+                <div class="d-flex align-items-center">
+                    <h3 class="stat-card-value">{{ analytics.total_views|format_number }}</h3>
+                    <span class="stat-card-trend positive ms-2">
+                        <i class="fas fa-arrow-up me-1"></i>{{ analytics.view_growth }}%
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6 mb-4 mb-md-0">
+        <div class="stat-card">
+            <div class="stat-card-content">
+                <h6 class="stat-card-title">SUBSCRIBERS</h6>
+                <div class="d-flex align-items-center">
+                    <h3 class="stat-card-value">{{ analytics.subscribers|format_number }}</h3>
+                    <span class="stat-card-trend positive ms-2">
+                        <i class="fas fa-arrow-up me-1"></i>{{ analytics.subscriber_growth }}%
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6 mb-4 mb-md-0">
+        <div class="stat-card">
+            <div class="stat-card-content">
+                <h6 class="stat-card-title">WATCH TIME (HOURS)</h6>
+                <div class="d-flex align-items-center">
+                    <h3 class="stat-card-value">42.8K</h3>
+                    <span class="stat-card-trend positive ms-2">
+                        <i class="fas fa-arrow-up me-1"></i>15.2%
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="stat-card">
+            <div class="stat-card-content">
+                <h6 class="stat-card-title">REVENUE</h6>
+                <div class="d-flex align-items-center">
+                    <h3 class="stat-card-value">${{ analytics.revenue|format_number }}</h3>
+                    <span class="stat-card-trend positive ms-2">
+                        <i class="fas fa-arrow-up me-1"></i>{{ analytics.revenue_growth }}%
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Analytics Charts -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="dashboard-card mb-4">
+            <div class="dashboard-card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Performance Overview</h5>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-sm btn-outline-secondary active" data-metric="views">Views</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-metric="watch-time">Watch Time</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-metric="subscribers">Subscribers</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-metric="revenue">Revenue</button>
+                </div>
+            </div>
+            <div class="dashboard-card-body">
+                <canvas id="performanceChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Audience & Traffic -->
+<div class="row mb-4">
+    <div class="col-lg-6 mb-4 mb-lg-0">
+        <div class="dashboard-card">
+            <div class="dashboard-card-header">
+                <h5 class="mb-0">Audience Demographics</h5>
+            </div>
+            <div class="dashboard-card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-center mb-3">Age Distribution</h6>
+                        <canvas id="ageChart" height="200"></canvas>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-center mb-3">Gender Distribution</h6>
+                        <canvas id="genderChart" height="200"></canvas>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <h6 class="mb-3">Top Countries</h6>
+                    <div class="countries-list">
+                        <div class="country-item">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <div class="d-flex align-items-center">
+                                    <span class="country-flag">🇺🇸</span>
+                                    <span class="ms-2">United States</span>
+                                </div>
+                                <span>37.2%</span>
+                            </div>
+                            <div class="progress" style="height: 6px;">
+                                <div class="progress-bar" style="width: 37.2%"></div>
+                            </div>
+                        </div>
+                        <div class="country-item mt-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <div class="d-flex align-items-center">
+                                    <span class="country-flag">🇬🇧</span>
+                                    <span class="ms-2">United Kingdom</span>
+                                </div>
+                                <span>14.8%</span>
+                            </div>
+                            <div class="progress" style="height: 6px;">
+                                <div class="progress-bar" style="width: 14.8%"></div>
+                            </div>
+                        </div>
+                        <div class="country-item mt-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <div class="d-flex align-items-center">
+                                    <span class="country-flag">🇨🇦</span>
+                                    <span class="ms-2">Canada</span>
+                                </div>
+                                <span>9.5%</span>
+                            </div>
+                            <div class="progress" style="height: 6px;">
+                                <div class="progress-bar" style="width: 9.5%"></div>
+                            </div>
+                        </div>
+                        <div class="country-item mt-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <div class="d-flex align-items-center">
+                                    <span class="country-flag">🇦🇺</span>
+                                    <span class="ms-2">Australia</span>
+                                </div>
+                                <span>8.3%</span>
+                            </div>
+                            <div class="progress" style="height: 6px;">
+                                <div class="progress-bar" style="width: 8.3%"></div>
+                            </div>
+                        </div>
+                        <div class="country-item mt-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <div class="d-flex align-items-center">
+                                    <span class="country-flag">🇩🇪</span>
+                                    <span class="ms-2">Germany</span>
+                                </div>
+                                <span>6.7%</span>
+                            </div>
+                            <div class="progress" style="height: 6px;">
+                                <div class="progress-bar" style="width: 6.7%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="dashboard-card">
+            <div class="dashboard-card-header">
+                <h5 class="mb-0">Traffic Sources</h5>
+            </div>
+            <div class="dashboard-card-body">
+                <canvas id="trafficSourcesChart" height="250"></canvas>
+                <div class="mt-4">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="traffic-source-item">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>YouTube Search</span>
+                                    <span>42.3%</span>
+                                </div>
+                                <div class="progress" style="height: 6px;">
+                                    <div class="progress-bar bg-primary" style="width: 42.3%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="traffic-source-item">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>Suggested Videos</span>
+                                    <span>28.7%</span>
+                                </div>
+                                <div class="progress" style="height: 6px;">
+                                    <div class="progress-bar bg-success" style="width: 28.7%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <div class="traffic-source-item">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>External</span>
+                                    <span>15.4%</span>
+                                </div>
+                                <div class="progress" style="height: 6px;">
+                                    <div class="progress-bar bg-info" style="width: 15.4%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="traffic-source-item">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>Browse Features</span>
+                                    <span>9.8%</span>
+                                </div>
+                                <div class="progress" style="height: 6px;">
+                                    <div class="progress-bar bg-warning" style="width: 9.8%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <div class="traffic-source-item">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>Direct or Unknown</span>
+                                    <span>3.8%</span>
+                                </div>
+                                <div class="progress" style="height: 6px;">
+                                    <div class="progress-bar bg-secondary" style="width: 3.8%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Video Performance -->
+<div class="row">
+    <div class="col-12">
+        <div class="dashboard-card">
+            <div class="dashboard-card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Top Performing Videos</h5>
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-sort me-1"></i> Sort By
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item active" href="#">Views</a></li>
+                        <li><a class="dropdown-item" href="#">Watch Time</a></li>
+                        <li><a class="dropdown-item" href="#">Engagement</a></li>
+                        <li><a class="dropdown-item" href="#">Revenue</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="dashboard-card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover video-performance-table mb-0">
+                        <thead>
+                            <tr>
+                                <th scope="col">VIDEO</th>
+                                <th scope="col">VIEWS</th>
+                                <th scope="col">WATCH TIME</th>
+                                <th scope="col">AVG VIEW DURATION</th>
+                                <th scope="col">ENGAGEMENT</th>
+                                <th scope="col">REVENUE</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="video-thumbnail me-3">
+                                            <img src="https://images.unsplash.com/photo-1485846234645-a62644f84728" alt="Video thumbnail">
+                                        </div>
+                                        <div class="video-info">
+                                            <h6 class="mb-0">Web 3.0: Complete Developer Roadmap</h6>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>51.3K</td>
+                                <td>4,218 hrs</td>
+                                <td>8:42</td>
+                                <td>9.8%</td>
+                                <td>$428</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="video-thumbnail me-3">
+                                            <img src="https://images.unsplash.com/photo-1459184070881-58235578f004" alt="Video thumbnail">
+                                        </div>
+                                        <div class="video-info">
+                                            <h6 class="mb-0">Machine Learning Explained: Beginner's Guide</h6>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>42.8K</td>
+                                <td>3,964 hrs</td>
+                                <td>10:15</td>
+                                <td>8.9%</td>
+                                <td>$372</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="video-thumbnail me-3">
+                                            <img src="https://images.unsplash.com/photo-1682506456442-a051e8dae813" alt="Video thumbnail">
+                                        </div>
+                                        <div class="video-info">
+                                            <h6 class="mb-0">Quantum Computing: The Future is Now</h6>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>36.2K</td>
+                                <td>3,258 hrs</td>
+                                <td>9:32</td>
+                                <td>8.3%</td>
+                                <td>$314</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="video-thumbnail me-3">
+                                            <img src="https://images.unsplash.com/photo-1497015455546-1da71faf8d06" alt="Video thumbnail">
+                                        </div>
+                                        <div class="video-info">
+                                            <h6 class="mb-0">Top 5 AI Tools for Content Creation in 2025</h6>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>24.5K</td>
+                                <td>1,842 hrs</td>
+                                <td>7:52</td>
+                                <td>9.4%</td>
+                                <td>$196</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Performance Chart
+        const performanceCtx = document.getElementById('performanceChart').getContext('2d');
+        const performanceChart = new Chart(performanceCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                datasets: [{
+                    label: 'Views',
+                    data: [12000, 15000, 18500, 22000, 25000, 27500, 30000, 36000, 42000, 48000, 53000, 58000],
+                    fill: true,
+                    backgroundColor: 'rgba(155, 77, 255, 0.1)',
+                    borderColor: 'rgba(155, 77, 255, 1)',
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointBackgroundColor: 'rgba(155, 77, 255, 1)'
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)'
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                if (value >= 1000) {
+                                    return value / 1000 + 'K';
+                                }
+                                return value;
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)'
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Age Chart
+        const ageCtx = document.getElementById('ageChart').getContext('2d');
+        const ageChart = new Chart(ageCtx, {
+            type: 'bar',
+            data: {
+                labels: ['18-24', '25-34', '35-44', '45-54', '55-64', '65+'],
+                datasets: [{
+                    label: 'Viewers by Age',
+                    data: [28, 35, 22, 9, 4, 2],
+                    backgroundColor: [
+                        'rgba(155, 77, 255, 0.8)',
+                        'rgba(155, 77, 255, 0.9)',
+                        'rgba(155, 77, 255, 0.7)',
+                        'rgba(155, 77, 255, 0.6)',
+                        'rgba(155, 77, 255, 0.5)',
+                        'rgba(155, 77, 255, 0.4)'
+                    ],
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.parsed.y + '%';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Gender Chart
+        const genderCtx = document.getElementById('genderChart').getContext('2d');
+        const genderChart = new Chart(genderCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Male', 'Female', 'Other'],
+                datasets: [{
+                    data: [65, 32, 3],
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.8)',
+                        'rgba(255, 99, 132, 0.8)',
+                        'rgba(75, 192, 192, 0.8)'
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                cutout: '70%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            boxWidth: 12,
+                            padding: 15
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.label + ': ' + context.parsed + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Traffic Sources Chart
+        const trafficCtx = document.getElementById('trafficSourcesChart').getContext('2d');
+        const trafficChart = new Chart(trafficCtx, {
+            type: 'pie',
+            data: {
+                labels: ['YouTube Search', 'Suggested Videos', 'External', 'Browse Features', 'Direct or Unknown'],
+                datasets: [{
+                    data: [42.3, 28.7, 15.4, 9.8, 3.8],
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.8)',
+                        'rgba(75, 192, 192, 0.8)',
+                        'rgba(153, 102, 255, 0.8)',
+                        'rgba(255, 159, 64, 0.8)',
+                        'rgba(201, 203, 207, 0.8)'
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            boxWidth: 12,
+                            padding: 15
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.label + ': ' + context.parsed + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Change metric for performance chart
+        const metricButtons = document.querySelectorAll('[data-metric]');
+        metricButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                metricButtons.forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                
+                const metric = this.getAttribute('data-metric');
+                let data, label, color;
+                
+                switch(metric) {
+                    case 'views':
+                        data = [12000, 15000, 18500, 22000, 25000, 27500, 30000, 36000, 42000, 48000, 53000, 58000];
+                        label = 'Views';
+                        color = 'rgba(155, 77, 255, 1)';
+                        bgColor = 'rgba(155, 77, 255, 0.1)';
+                        break;
+                    case 'watch-time':
+                        data = [980, 1250, 1580, 1820, 2100, 2350, 2600, 3100, 3650, 4200, 4600, 5100];
+                        label = 'Watch Time (hours)';
+                        color = 'rgba(54, 162, 235, 1)';
+                        bgColor = 'rgba(54, 162, 235, 0.1)';
+                        break;
+                    case 'subscribers':
+                        data = [500, 650, 820, 980, 1200, 1450, 1700, 2000, 2350, 2650, 2950, 3250];
+                        label = 'New Subscribers';
+                        color = 'rgba(75, 192, 192, 1)';
+                        bgColor = 'rgba(75, 192, 192, 0.1)';
+                        break;
+                    case 'revenue':
+                        data = [80, 110, 145, 190, 220, 260, 310, 370, 420, 480, 550, 620];
+                        label = 'Revenue ($)';
+                        color = 'rgba(255, 159, 64, 1)';
+                        bgColor = 'rgba(255, 159, 64, 0.1)';
+                        break;
+                }
+                
+                performanceChart.data.datasets[0].data = data;
+                performanceChart.data.datasets[0].label = label;
+                performanceChart.data.datasets[0].borderColor = color;
+                performanceChart.data.datasets[0].backgroundColor = bgColor;
+                performanceChart.data.datasets[0].pointBackgroundColor = color;
+                performanceChart.update();
+            });
+        });
+    });
+</script>
+{% endblock %}

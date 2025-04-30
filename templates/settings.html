@@ -1,0 +1,351 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <h1 class="page-title">Settings</h1>
+    <button class="btn btn-primary" id="saveSettingsBtn">
+        <i class="fas fa-save me-2"></i> Save Changes
+    </button>
+</div>
+
+<div class="row">
+    <!-- Account Settings -->
+    <div class="col-lg-4 mb-4">
+        <div class="dashboard-card h-100">
+            <div class="dashboard-card-header">
+                <h5 class="mb-0">Account Settings</h5>
+            </div>
+            <div class="dashboard-card-body">
+                <div class="account-info mb-4">
+                    <div class="text-center mb-3">
+                        <div class="user-avatar-large">{{ settings.username }}</div>
+                        <button class="btn btn-sm btn-outline-secondary mt-2">
+                            <i class="fas fa-camera me-2"></i> Change Photo
+                        </button>
+                    </div>
+                </div>
+                
+                <form id="accountSettingsForm">
+                    <div class="mb-3">
+                        <label for="channelName" class="form-label">Channel Name</label>
+                        <input type="text" class="form-control" id="channelName" value="{{ settings.channel_name }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="username" value="{{ settings.username }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email Address</label>
+                        <input type="email" class="form-control" id="email" value="user@example.com">
+                    </div>
+                    <div class="mb-3">
+                        <label for="currentPassword" class="form-label">Current Password</label>
+                        <input type="password" class="form-control" id="currentPassword" placeholder="Enter current password">
+                    </div>
+                    <div class="mb-3">
+                        <label for="newPassword" class="form-label">New Password</label>
+                        <input type="password" class="form-control" id="newPassword" placeholder="Enter new password">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- API Connections -->
+    <div class="col-lg-4 mb-4">
+        <div class="dashboard-card h-100">
+            <div class="dashboard-card-header">
+                <h5 class="mb-0">API Connections</h5>
+            </div>
+            <div class="dashboard-card-body">
+                <div class="api-connection-item">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="d-flex align-items-center">
+                            <div class="api-icon youtube">
+                                <i class="fab fa-youtube"></i>
+                            </div>
+                            <div class="ms-3">
+                                <h6 class="mb-0">YouTube Data API</h6>
+                                <small class="text-muted">Connect to upload & manage videos</small>
+                            </div>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="youtubeApiSwitch" {% if settings.api_keys.youtube_connected %}checked{% endif %}>
+                        </div>
+                    </div>
+                    <div class="api-key-input {% if not settings.api_keys.youtube_connected %}d-none{% endif %}" id="youtubeApiKey">
+                        <div class="input-group">
+                            <input type="password" class="form-control" placeholder="YouTube API Key" value="••••••••••••••••">
+                            <button class="btn btn-outline-secondary" type="button">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="api-connection-item mt-4">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="d-flex align-items-center">
+                            <div class="api-icon openai">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div class="ms-3">
+                                <h6 class="mb-0">OpenAI API</h6>
+                                <small class="text-muted">Generate content with AI</small>
+                            </div>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="openaiApiSwitch" {% if settings.api_keys.openai_connected %}checked{% endif %}>
+                        </div>
+                    </div>
+                    <div class="api-key-input {% if not settings.api_keys.openai_connected %}d-none{% endif %}" id="openaiApiKey">
+                        <div class="input-group">
+                            <input type="password" class="form-control" placeholder="OpenAI API Key" value="••••••••••••••••">
+                            <button class="btn btn-outline-secondary" type="button">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="api-connection-item mt-4">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="d-flex align-items-center">
+                            <div class="api-icon google">
+                                <i class="fab fa-google"></i>
+                            </div>
+                            <div class="ms-3">
+                                <h6 class="mb-0">Google Trends API</h6>
+                                <small class="text-muted">Research trending topics</small>
+                            </div>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="googleApiSwitch" {% if settings.api_keys.google_trends_connected %}checked{% endif %}>
+                        </div>
+                    </div>
+                    <div class="api-key-input {% if not settings.api_keys.google_trends_connected %}d-none{% endif %}" id="googleApiKey">
+                        <div class="input-group">
+                            <input type="password" class="form-control" placeholder="Google API Key" value="••••••••••••••••">
+                            <button class="btn btn-outline-secondary" type="button">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Publishing Preferences -->
+    <div class="col-lg-4 mb-4">
+        <div class="dashboard-card h-100">
+            <div class="dashboard-card-header">
+                <h5 class="mb-0">Publishing Preferences</h5>
+            </div>
+            <div class="dashboard-card-body">
+                <form id="publishingPreferencesForm">
+                    <div class="mb-3">
+                        <label class="form-label">Optimal Publishing Time</label>
+                        <input type="time" class="form-control" value="{{ settings.publishing_preferences.optimal_time }}">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Publishing Days</label>
+                        <div class="publish-days">
+                            {% for day in ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] %}
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="day{{ day }}" {% if day in settings.publishing_preferences.days %}checked{% endif %}>
+                                <label class="form-check-label" for="day{{ day }}">{{ day }}</label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="videoLength" class="form-label">Preferred Video Length</label>
+                        <select class="form-select" id="videoLength">
+                            <option value="2-3 minutes" {% if settings.publishing_preferences.video_length == '2-3 minutes' %}selected{% endif %}>2-3 minutes</option>
+                            <option value="5-10 minutes" {% if settings.publishing_preferences.video_length == '5-10 minutes' %}selected{% endif %}>5-10 minutes</option>
+                            <option value="10-15 minutes" {% if settings.publishing_preferences.video_length == '10-15 minutes' %}selected{% endif %}>10-15 minutes</option>
+                            <option value="15-20 minutes" {% if settings.publishing_preferences.video_length == '15-20 minutes' %}selected{% endif %}>15-20 minutes</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="videoFormat" class="form-label">Default Video Format</label>
+                        <select class="form-select" id="videoFormat">
+                            <option value="16:9" {% if settings.publishing_preferences.format == '16:9' %}selected{% endif %}>16:9 (Landscape)</option>
+                            <option value="9:16" {% if settings.publishing_preferences.format == '9:16' %}selected{% endif %}>9:16 (Portrait)</option>
+                            <option value="1:1" {% if settings.publishing_preferences.format == '1:1' %}selected{% endif %}>1:1 (Square)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="defaultCategory" class="form-label">Default Video Category</label>
+                        <select class="form-select" id="defaultCategory">
+                            <option value="Technology">Technology</option>
+                            <option value="Business">Business</option>
+                            <option value="Education">Education</option>
+                            <option value="Science">Science</option>
+                            <option value="Entertainment">Entertainment</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Advanced Settings -->
+    <div class="col-12">
+        <div class="dashboard-card">
+            <div class="dashboard-card-header">
+                <h5 class="mb-0">Advanced Settings</h5>
+            </div>
+            <div class="dashboard-card-body">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <h6 class="mb-3">Automation Settings</h6>
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="autoPublishSwitch" checked>
+                                <label class="form-check-label" for="autoPublishSwitch">
+                                    <strong>Auto-Publish Videos</strong>
+                                    <p class="text-muted small mb-0">Automatically publish videos when they're ready</p>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="emailNotificationsSwitch" checked>
+                                <label class="form-check-label" for="emailNotificationsSwitch">
+                                    <strong>Email Notifications</strong>
+                                    <p class="text-muted small mb-0">Receive email updates about your videos</p>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="autoOptimizeSwitch" checked>
+                                <label class="form-check-label" for="autoOptimizeSwitch">
+                                    <strong>Auto-Optimize SEO</strong>
+                                    <p class="text-muted small mb-0">Automatically optimize video titles and descriptions</p>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-6">
+                        <h6 class="mb-3">Data Management</h6>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <strong>Storage Usage</strong>
+                                    <p class="text-muted small mb-1">3.2 GB used of 10 GB</p>
+                                    <div class="progress" style="height: 6px; width: 250px;">
+                                        <div class="progress-bar" role="progressbar" style="width: 32%"></div>
+                                    </div>
+                                </div>
+                                <button class="btn btn-sm btn-outline-secondary">Manage</button>
+                            </div>
+                        </div>
+                        <div class="mb-3 mt-4">
+                            <button class="btn btn-outline-secondary btn-sm">
+                                <i class="fas fa-download me-2"></i> Export Analytics Data
+                            </button>
+                        </div>
+                        <div class="mt-4">
+                            <button class="btn btn-outline-danger btn-sm">
+                                <i class="fas fa-trash me-2"></i> Clear Cached Data
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Save Changes Modal -->
+<div class="modal fade" id="settingsSavedModal" tabindex="-1">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-body text-center py-4">
+                <i class="fas fa-check-circle text-success fa-4x mb-3"></i>
+                <h5>Settings Saved</h5>
+                <p class="mb-0">Your changes have been saved successfully.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // API connection toggles
+        const apiSwitches = {
+            'youtubeApiSwitch': 'youtubeApiKey',
+            'openaiApiSwitch': 'openaiApiKey',
+            'googleApiSwitch': 'googleApiKey'
+        };
+        
+        for (const [switchId, keyId] of Object.entries(apiSwitches)) {
+            const switchElem = document.getElementById(switchId);
+            const keyElem = document.getElementById(keyId);
+            
+            if (switchElem && keyElem) {
+                switchElem.addEventListener('change', function() {
+                    if (this.checked) {
+                        keyElem.classList.remove('d-none');
+                    } else {
+                        keyElem.classList.add('d-none');
+                    }
+                });
+            }
+        }
+        
+        // Password visibility toggles
+        const eyeButtons = document.querySelectorAll('.api-key-input .btn');
+        eyeButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const input = this.parentElement.querySelector('input');
+                const icon = this.querySelector('i');
+                
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    input.type = 'password';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            });
+        });
+        
+        // Save settings button
+        const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+        if (saveSettingsBtn) {
+            saveSettingsBtn.addEventListener('click', function() {
+                // Show loading state
+                this.disabled = true;
+                this.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Saving...';
+                
+                // Simulate saving
+                setTimeout(() => {
+                    // Reset button
+                    this.disabled = false;
+                    this.innerHTML = '<i class="fas fa-save me-2"></i> Save Changes';
+                    
+                    // Show success modal
+                    const modal = new bootstrap.Modal(document.getElementById('settingsSavedModal'));
+                    modal.show();
+                }, 1000);
+            });
+        }
+    });
+</script>
+{% endblock %}
